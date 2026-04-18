@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>For Rimpa 🌷</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garant:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --rose:    #c0537a;
+      --blush:   #f4b8c8;
+      --cream:   #fff8f2;
+      --gold:    #c9915a;
+      --deep:    #5c1f36;
+      --text:    #3a1a26;
+      --muted:   #a07080;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Cormorant Garant', serif;
+      background: var(--cream);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── PETALS ─────────────────────────────────────── */
+    .petals {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 0;
+      overflow: hidden;
+    }
+    .petal {
+      position: absolute; top: -40px;
+      width: 14px; height: 18px;
+      background: radial-gradient(ellipse at 40% 40%, #f9d0dc, #e07ba0cc);
+      border-radius: 0 80% 0 80%;
+      opacity: 0.7;
+      animation: fall linear infinite;
+    }
+    @keyframes fall {
+      0%   { transform: translateY(-40px) rotate(0deg); opacity: .8; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* ─── PASSWORD SCREEN ────────────────────────────── */
+    #lock-screen {
+      position: fixed; inset: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(145deg, #fce8ef 0%, #fdf5f0 60%, #fce8e8 100%);
+    }
+    .lock-card {
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(192,83,122,0.18);
+      border-radius: 28px;
+      padding: 52px 48px 44px;
+      text-align: center;
+      box-shadow: 0 16px 60px rgba(192,83,122,0.15), 0 2px 8px rgba(0,0,0,0.06);
+      max-width: 360px; width: 90%;
+      animation: cardIn .6s ease forwards;
+    }
+    @keyframes cardIn {
+      from { opacity:0; transform:translateY(24px) scale(.97); }
+      to   { opacity:1; transform:translateY(0) scale(1); }
+    }
+    .lock-heart {
+      font-size: 2.6rem;
+      animation: pulse 1.8s ease-in-out infinite;
+      display: block; margin-bottom: 18px;
+    }
+    @keyframes pulse {
+      0%,100% { transform: scale(1); }
+      50%      { transform: scale(1.15); }
+    }
+    .lock-card h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; font-weight: 400; font-style: italic;
+      color: var(--deep); margin-bottom: 8px;
+    }
+    .lock-card p {
+      font-size: 1rem; color: var(--muted); margin-bottom: 28px;
+    }
+    .lock-card input {
+      width: 100%;
+      padding: 14px 18px;
+      border: 1.5px solid var(--blush);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.8);
+      font-family: 'Cormorant Garant', serif;
+      font-size: 1.2rem; letter-spacing: 4px;
+      color: var(--deep); text-align: center;
+      outline: none; transition: border .2s, box-shadow .2s;
+      margin-bottom: 14px;
+    }
+    .lock-card input:focus {
+      border-color: var(--rose);
+      box-shadow: 0 0 0 4px rgba(192,83,122,0.12);
+    }
+    .lock-card button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--rose), #e07ba0);
+      color: #fff; border: none; border-radius: 14px;
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem; font-style: italic; letter-spacing: 1px;
+      cursor: pointer;
+      transition: transform .15s, box-shadow .15s;
+      box-shadow: 0 6px 20px rgba(192,83,122,0.35);
+    }
+    .lock-card button:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(192,83,122,0.4); }
+    .lock-error {
+      color: #c0394f; font-size: .9rem; margin-top: 10px;
+      min-height: 20px; opacity: 0; transition: opacity .3s;
+    }
+    .lock-error.show { opacity: 1; }
+
+    /* ─── MAIN APP ───────────────────────────────────── */
+    #app { display: none; position: relative; z-index: 1; }
+    #app.visible { display: block; }
+
+    /* ─── HERO ───────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 80px 24px 60px;
+      position: relative;
+    }
+    .hero-badge {
+      display: inline-block;
+      border: 1px solid rgba(192,83,122,0.3);
+      color: var(--rose);
+      font-size: .85rem; letter-spacing: 3px; text-transform: uppercase;
+      padding: 7px 20px; border-radius: 40px;
+      background: rgba(244,184,200,0.15);
+      margin-bottom: 30px;
+      animation: fadeUp .8s .2s both;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 8vw, 5.5rem);
+      line-height: 1.1;
+      color: var(--deep);
+      font-weight: 700;
+      animation: fadeUp .8s .35s both;
+    }
+    .hero h1 span { color: var(--rose); font-style: italic; }
+    .hero-age {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.2rem, 4vw, 2rem);
+      color: var(--gold); margin-top: 8px;
+      animation: fadeUp .8s .5s both;
+    }
+    .hero-quote {
+      max-width: 500px;
+      font-size: 1.1rem; line-height: 1.8;
+      color: var(--muted); font-style: italic;
+      margin: 28px auto 0;
+      animation: fadeUp .8s .65s both;
+    }
+    .hero-divider {
+      width: 80px; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--rose), transparent);
+      margin: 36px auto 10px;
+      animation: fadeUp .8s .8s both;
+    }
+    .scroll-hint {
+      position: absolute; bottom: 28px;
+      font-size: .85rem; color: var(--muted); letter-spacing: 2px;
+      text-transform: uppercase;
+      animation: bounce 2s 1.2s infinite;
+    }
+    @keyframes bounce {
+      0%,100%{ transform:translateY(0); }
+      50%{ transform:translateY(6px); }
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(22px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* ─── DATES SECTION ──────────────────────────────── */
+    .section {
+      padding: 80px 24px;
+      max-width: 1280px; margin: 0 auto;
+    }
+    .section-label {
+      text-align: center;
+      font-size: .8rem; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--rose); margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      text-align: center; color: var(--deep);
+      margin-bottom: 12px;
+    }
+    .section-sub {
+      text-align: center; color: var(--muted);
+      font-style: italic; font-size: 1.05rem; margin-bottom: 52px;
+    }
+
+    .dates-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 24px;
+    }
+    .date-card {
+      background: rgba(255,255,255,0.65);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(192,83,122,0.14);
+      border-radius: 20px;
+      padding: 28px 24px;
+      cursor: pointer;
+      transition: transform .25s, box-shadow .25s, border-color .25s;
+      position: relative; overflow: hidden;
+    }
+    .date-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--blush), var(--rose), var(--gold));
+      opacity: 0; transition: opacity .25s;
+    }
+    .date-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 40px rgba(192,83,122,0.18);
+      border-color: rgba(192,83,122,0.35);
+    }
+    .date-card:hover::before { opacity: 1; }
+    .date-icon { font-size: 1.8rem; margin-bottom: 12px; }
+    .date-label {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem; color: var(--deep); margin-bottom: 6px;
+    }
+    .date-date {
+      font-size: .95rem; color: var(--rose); letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+    .date-desc {
+      font-size: .9rem; color: var(--muted); font-style: italic; line-height: 1.6;
+    }
+    .date-cta {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 16px; font-size: .85rem; color: var(--rose);
+      letter-spacing: 1px;
+    }
+
+    /* ─── LOVE QUOTES STRIP ──────────────────────────── */
+    .quotes-strip {
+      background: linear-gradient(135deg, var(--deep), #8b2845);
+      padding: 70px 24px;
+      text-align: center;
+    }
+    .quotes-strip .q-label {
+      font-size: .75rem; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--blush); margin-bottom: 24px;
+    }
+    .quote-text {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.4rem, 4vw, 2.2rem);
+      color: #fff; font-style: italic; line-height: 1.6;
+      max-width: 680px; margin: 0 auto 16px;
+      transition: opacity .5s;
+    }
+    .quote-attr {
+      color: var(--blush); font-size: .95rem; letter-spacing: 1px;
+    }
+    .quote-nav { margin-top: 28px; display: flex; justify-content: center; gap: 10px; }
+    .q-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(244,184,200,0.35); cursor: pointer; transition: background .2s;
+    }
+    .q-dot.active { background: var(--blush); }
+
+    /* ─── PHOTO MODAL ────────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(30,8,18,0.82);
+      backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity .3s;
+      padding: 20px;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal-box {
+      background: #fff9f5;
+      border-radius: 24px;
+      max-width: 560px; width: 100%;
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+      transform: scale(.94) translateY(20px);
+      transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+      position: relative;
+    }
+    .modal-overlay.open .modal-box { transform: scale(1) translateY(0); }
+    .modal-photo {
+      width: 100%; aspect-ratio: 1/1;
+      object-fit: cover;
+      display: block;
+      background: linear-gradient(135deg, #fce8ef, #fdf5f0);
+    }
+    .modal-photo-placeholder {
+      width: 100%; aspect-ratio: 1/1;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #fce8ef, #fdf5f0);
+      color: var(--muted);
+      gap: 12px;
+    }
+    .modal-photo-placeholder span { font-size: 3rem; }
+    .modal-photo-placeholder p { font-style: italic; font-size: .95rem; }
+    .modal-body { padding: 28px 32px 32px; }
+    .modal-date-badge {
+      display: inline-block;
+      background: rgba(192,83,122,0.1);
+      color: var(--rose); font-size: .8rem; letter-spacing: 2px;
+      text-transform: uppercase; padding: 5px 14px; border-radius: 20px;
+      margin-bottom: 12px;
+    }
+    .modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; color: var(--deep); margin-bottom: 10px;
+    }
+    .modal-note { font-size: 1rem; color: var(--muted); font-style: italic; line-height: 1.7; }
+    .modal-close {
+      position: absolute; top: 14px; right: 16px;
+      background: rgba(255,255,255,0.85); border: none;
+      width: 36px; height: 36px; border-radius: 50%;
+      font-size: 1.1rem; cursor: pointer; color: var(--deep);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+      transition: transform .15s;
+    }
+    .modal-close:hover { transform: scale(1.1); }
+
+    /* ─── FOOTER ─────────────────────────────────────── */
+    footer {
+      text-align: center; padding: 50px 24px;
+      border-top: 1px solid rgba(192,83,122,0.1);
+      color: var(--muted); font-style: italic; font-size: .95rem; line-height: 2;
+    }
+    footer strong { color: var(--rose); font-style: normal; }
+
+    /* ─── MUSIC PLAYER ───────────────────────────────── */
+    .music-btn {
+      position: fixed; bottom: 28px; right: 28px; z-index: 50;
+      width: 54px; height: 54px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--rose), #e07ba0);
+      border: none; cursor: pointer; color: #fff; font-size: 1.3rem;
+      box-shadow: 0 6px 24px rgba(192,83,122,0.45);
+      display: flex; align-items: center; justify-content: center;
+      transition: transform .2s, box-shadow .2s;
+      animation: musicPulse 2s 2s ease-in-out infinite;
+    }
+    .music-btn:hover { transform: scale(1.1); }
+    @keyframes musicPulse {
+      0%,100%{ box-shadow: 0 6px 24px rgba(192,83,122,0.45); }
+      50%    { box-shadow: 0 6px 32px rgba(192,83,122,0.7), 0 0 0 8px rgba(192,83,122,0.1); }
+    }
+    .music-label {
+      position: fixed; bottom: 34px; right: 92px; z-index: 50;
+      background: rgba(255,255,255,0.9); border: 1px solid var(--blush);
+      border-radius: 20px; padding: 6px 16px;
+      font-size: .8rem; color: var(--rose); letter-spacing: 1px;
+      white-space: nowrap; opacity: 0;
+      transition: opacity .3s; pointer-events: none;
+    }
+    .music-btn:hover + .music-label { opacity: 1; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--cream); }
+    ::-webkit-scrollbar-thumb { background: var(--blush); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- PETALS -->
+<div class="petals" id="petals"></div>
+
+<!--
+  HOW TO ADD THE SONG:
+  1. Download "Still Into You - Brent Morgan" as an MP3 file.
+  2. Rename it to: song.mp3
+  3. Place it in the SAME folder as this HTML file.
+-->
+<audio id="bgMusic" loop>
+  <source src="Still Into You- Brent Morgan.mp3" controls/>
+</audio>
+
+<!-- PASSWORD SCREEN -->
+<div id="lock-screen">
+  <div class="lock-card">
+    <span class="lock-heart">🌷</span>
+    <h2>A private place</h2>
+    <p>Only for you and me❤️</p>
+    <input type="password" id="pwInput" placeholder="••••••••••" maxlength="20"
+           onkeydown="if(event.key==='Enter') unlock()"/>
+    <button onclick="unlock()">Enter ✦</button>
+    <p class="lock-error" id="lockError">Hmm, that's not right. Try again 🌷</p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <!-- HERO -->
+  <section class="hero">
+    <span class="hero-badge">✦ A celebration just for you ✦</span>
+    <h1>Happy Birthday,<br/><span>Rimpa</span></h1>
+    <p class="hero-age">Turning 21 🎂</p>
+    <p class="hero-quote">
+      "Every moment with you has been a story worth keeping forever."
+    </p>
+    <div class="hero-divider"></div>
+    <p class="scroll-hint">↓ scroll ↓</p>
+  </section>
+
+  <!-- DATES SECTION -->
+  <section class="section">
+    <p class="section-label">✦ Our Story ✦</p>
+    <h2 class="section-title">Days I'll keep in my heart forever</h2>
+    <p class="section-sub">Click on any date to see the memory from that day.</p>
+    <div class="dates-grid" id="datesGrid"></div>
+  </section>
+
+  <!-- QUOTES STRIP -->
+  <div class="quotes-strip">
+    <p class="q-label">✦ For You ✦</p>
+    <p class="quote-text" id="qText"></p>
+    <p class="quote-attr" id="qAttr"></p>
+    <div class="quote-nav" id="qNav"></div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>Made with every beat of my heart for you, <strong>Rimpa</strong>. There's still a lifetime to go!🌷</p>
+    <p style="margin-top:8px; font-size:.85rem; opacity:.6;">
+      "Still Into You" — playing softly, just like my feelings for you.
+    </p>
+  </footer>
+</div>
+
+<!-- PHOTO MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal-box" id="modalBox">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modalImg"></div>
+    <div class="modal-body">
+      <span class="modal-date-badge" id="mBadge"></span>
+      <h3 class="modal-title" id="mTitle"></h3>
+      <p class="modal-note" id="mNote"></p>
+    </div>
+  </div>
+</div>
+
+<!-- MUSIC BUTTON -->
+<button class="music-btn" id="musicBtn" onclick="toggleMusic()" title="Play / Pause">♪</button>
+<span class="music-label">Still Into You 🎵</span>
+
+<script>
+
+  /* ── PASSWORD ── */
+  function unlock() {
+    const val = document.getElementById('pwInput').value.trim();
+    if (val === '1927.2024') {
+      document.getElementById('lock-screen').style.transition = 'opacity .6s';
+      document.getElementById('lock-screen').style.opacity = '0';
+      setTimeout(() => {
+        document.getElementById('lock-screen').style.display = 'none';
+        document.getElementById('app').classList.add('visible');
+        startPetals();
+        document.getElementById('bgMusic').play().catch(() => {});
+      }, 600);
+    } else {
+      const err = document.getElementById('lockError');
+      err.classList.add('show');
+      document.getElementById('pwInput').value = '';
+      document.getElementById('pwInput').focus();
+    }
+  }
+
+  /* ── MUSIC ── */
+  let playing = false;
+  function toggleMusic() {
+    const m = document.getElementById('bgMusic');
+    const btn = document.getElementById('musicBtn');
+    if (playing) { m.pause(); btn.textContent = '♪'; playing = false; }
+    else         { m.play(); btn.textContent = '⏸'; playing = true; }
+  }
+
+  /* ── PETALS ── */
+  function startPetals() {
+    const container = document.getElementById('petals');
+    for (let i = 0; i < 18; i++) {
+      const p = document.createElement('div');
+      p.className = 'petal';
+      p.style.left             = Math.random() * 100 + 'vw';
+      p.style.animationDuration = (6 + Math.random() * 8) + 's';
+      p.style.animationDelay   = (Math.random() * 10) + 's';
+      p.style.width  = (10 + Math.random() * 10) + 'px';
+      p.style.height = (14 + Math.random() * 10) + 'px';
+      p.style.opacity = (.4 + Math.random() * .5).toString();
+      container.appendChild(p);
+    }
+  }
+
+  /* ── DATES DATA ──
+     Fill in your real values below.
+     For "photo", put the filename of your image e.g. "photo1.jpg"
+     and place that image file in the same folder as this HTML file.
+     Leave photo as "" to show a placeholder instead.
+  ── */
+  const dates = [
+    {
+      icon: "🌻",
+      label: "Our First Hello",
+      date: "29.08.2024",
+      desc: "The day of our first chit-chat. Though I lost our first chats, here is the first picture of you I saw.",
+      note: "When I did, couldn't stop smiling!",
+      photo: "Her first pic.jpeg" 
+    },
+    {
+      icon: "🦋",
+      label: "Our First Time Together",
+      date: "02.09.2024",
+      desc: "A memory I replay every day.",
+      note: "I was nervous. You were perfect. As always.",
+      photo: "First meet_2.jpeg"
+    },
+    {
+      icon: "🎒📚",
+      label: "That Class-end Meeting",
+      date: "04.10.2024",
+      desc: "You were returning home from MAAC and I was eturning from College. One chance is all it takes!",
+      note: "A 30-40 minute date if you consider it. Lol",
+      photo: "Class-end.jpeg"
+    },
+    {
+      icon: "🛕",
+      label: "Durga Puja Meet-up",
+      date: "08.10.2024",
+      desc: "4 days after the class-end, we went pandal hopping on Panchami!",
+      note: "I couldn't help us explore well due to your invitation in MAAC, but I enjoyed every bit like I always do.",
+      photo: "Puja meet-up.jpeg"
+    },
+    {
+      icon: "2️⃣🎒",
+      label: "2nd Class-end",
+      date: "04.11.2024",
+      desc: "What's better than making an excuse to just go out of home to meet the person who made me feel out of this World?.",
+      note: "Another 30-40 minute date. One of many others...",
+      photo: "2nd class-end.jpeg"
+    },
+    {
+      icon: "3️⃣🎒",
+      label: "3rd Class-end",
+      date: "19.11.2024",
+      desc: "Another excuse to meet-up. What could possibly go wrong?",
+      note: "I am just obssessed with you and your smile!",
+      photo: "3rd class-end.jpeg"
+    },
+    {
+      icon: "⚔️",
+      label: "Resolvement",
+      date: "24.11.2024",
+      desc: "We also had times when arguments went out of hand, but we still found our way back together.",
+      note: "We still argue, but that's the part of our beautiful and unbreakable bond!",
+      photo: "resolvement.jpeg"
+    },
+    { 
+      icon: "4️⃣🎒",
+      label: "4th Class-end",
+      date: "16.12.2024",
+      desc: "What excuse did I use this time? Let's observe the picture and find out!",
+      note: "Ahh! Great excuse! (Although that guitar was done for already...)",
+      photo: "guitar excuse.jpeg"
+    },
+    { 
+      icon: "🎂",
+      label: "Birthday Meet-up",
+      date: "27.12.2024",
+      desc: "Well it was my birthday, and guess who came to her class today? Coincidence or God's plan?",
+      note: "Also the letter is still kept hidden behind the Hanuman Chalisa! The letter is still Godsent because it was given by you!",
+      photo: "birthday meet.jpeg"
+    },
+    { 
+      icon: "5️⃣🎒",
+      label: "5th class-end",
+      date: "15.01.2025",
+      desc: "It was cold that day, but do you know what I did instead making a cup of hot chocolate at home?",
+      note: "Of course I went to meet you again!(You refused to take a better photo☹️)",
+      photo: "new year meet.jpeg"
+    },
+    { 
+      icon: "💌",
+      label: "Valentine's Meet-up",
+      date: "14.02.2025",
+      desc: "Meet-up on Valentine's Day!? Haha!! I gave you flowers and chocolates for the first time!! Let's see how we looked!",
+      note: "Well sad thing is I forgot to take a selfie.☹️ so here's one on the video call.(I can't leave it blank. Also I know I look horrible...)",
+      photo: "VC on 14th.jpeg"
+    },
+    { 
+      icon: "🎁",
+      label: "Farewell Gifts",
+      date: "10.07.2025",
+      desc: "The last meeting before you went back to Mumbai. I gave you the Barcelona jersey you loved, a box of choclates and a small rose bouquet",
+      note: "Here's that Jersey!! Oh Lord, you look so pretty in it!!",
+      photo: "farewell gift.jpeg"
+    },
+    { 
+      icon: "🫂🧳",
+      label: "Farewell Day",
+      date: "20.07.2025",
+      desc: "The day you left for Mumbai. The day when it felt like the precious thing that is going out of reach. Thhe good thing was I could meet you again for the last time to drop you off to howrah station",
+      note: "The last time I felt your touch before the long wait began...",
+      photo: "farewell day.jpeg"
+    },
+    { 
+      icon: "💋",
+      label: "Our First Kiss",
+      date: "07.03.26",
+      desc: "We met exactly after 230 days and guess what? We took a step further in our realaionship. A moment that made me feel like two Universes collapsed with each other!",
+      note: "The first time you came to my house, it felt like the room was glowing with a night's star even in day!",
+      photo: "first kiss.jpeg"
+    },
+    {
+      icon: "2️⃣🫂🧳",
+      label: "The Second Farewell",
+      date: "23.03.26",
+      desc: "We met again ater my 3rd semester exams were over. My birthday treat that was due! So, we went back to the place were everything began! The KFC was amazing!",
+      note: "You are far away again and another wait for your return begins. Now, your birthday treat reamins due!",
+      photo: "were we started.jpeg"
+    }
+];
+
+  /* ── RENDER DATE CARDS ── */
+  const grid = document.getElementById('datesGrid');0
+  dates.forEach((d, i) => {
+    const card = document.createElement('div');
+    card.className = 'date-card';
+    card.innerHTML = `
+      <div class="date-icon">${d.icon}</div>
+      <div class="date-label">${d.label}</div>
+      <div class="date-date">${d.date}</div>
+      <div class="date-desc">${d.desc}</div>
+      <div class="date-cta">View memory →</div>
+    `;
+    card.onclick = () => openModal(i);
+    grid.appendChild(card);
+  });
+
+  /* ── MODAL ── */
+  function openModal(i) {
+    const d = dates[i];
+    document.getElementById('mBadge').textContent = d.date;
+    document.getElementById('mTitle').textContent = d.label;
+    document.getElementById('mNote').textContent  = d.note;
+    const imgDiv = document.getElementById('modalImg');
+    if (d.photo) {
+      imgDiv.innerHTML = `<img class="modal-photo" src="${d.photo}" alt="${d.label}" onerror="this.parentElement.innerHTML=placeholderHTML()"/>`;
+    } else {
+      imgDiv.innerHTML = placeholderHTML();
+    }
+    document.getElementById('modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function placeholderHTML() {
+    return `<div class="modal-photo-placeholder">
+      <span>🌷             </span>
+      <p>Add your photo here</p>
+    </div>`;
+  }
+
+  function closeModal(e) {
+    if (e && e.target !== document.getElementById('modal') && e.type === 'click') return;
+    document.getElementById('modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  /* ── LOVE QUOTES ── */
+  const quotes = [
+    { text: "You are my today and all of my tomorrows." },
+    { text: "In all the world, there is no heart for me like yours." },
+    { text: "I saw that you were perfect, and so I loved you. Then I saw that you were not perfect, and I loved you even more." },
+    { text: "Every love story is beautiful, but ours is my favourite." },
+    { text: "You make me happier than I ever thought I could be." },
+    { text: "You changing me into the man I am supposed to be. I want to keep growing and learning with you through this jourey..."}
+  ];
+  let qIdx = 0;
+
+  function renderQuote() {
+    document.getElementById('qText').style.opacity = '0';
+    setTimeout(() => {
+      document.getElementById('qText').textContent = quotes[qIdx].text;
+      document.getElementById('qAttr').textContent = quotes[qIdx].attr;
+      document.getElementById('qText').style.opacity = '1';
+      document.querySelectorAll('.q-dot').forEach((d,i) => d.classList.toggle('active', i === qIdx));
+    }, 300);
+  }
+
+  const nav = document.getElementById('qNav');
+  quotes.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'q-dot' + (i === 0 ? ' active' : '');
+    dot.onclick = () => { qIdx = i; renderQuote(); };
+    nav.appendChild(dot);
+  });
+  renderQuote();
+  setInterval(() => { qIdx = (qIdx + 1) % quotes.length; renderQuote(); }, 5000);
+
+</script>
+</body>
+</html>
